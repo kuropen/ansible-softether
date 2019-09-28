@@ -1,0 +1,12 @@
+[Unit]
+Description=SoftEther VPN Server
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/opt/vpnserver/vpnserver start
+#ExecStartPost=/usr/local/vpnserver/add_tap.sh
+ExecStop=/opt/vpnserver/vpnserver stop
+
+[Install]
+WantedBy=multi-user.target

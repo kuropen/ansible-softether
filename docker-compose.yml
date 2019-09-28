@@ -1,0 +1,7 @@
+version: '3'
+services:
+  ansible:
+    build: ansible-docker
+    volumes:
+      - ./playbook:/opt/work
+      - ./sshconf:/opt/ssh

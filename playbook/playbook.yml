@@ -1,0 +1,52 @@
+- hosts: all
+  user: root
+  tasks:
+    - name: Add epel repository
+      yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    - name: Install dependencies
+      yum:
+        name: "{{packages}}"
+        state: present
+        enablerepo: epel
+      vars:
+        packages:
+          - gcc
+          - gcc-c++
+          - glibc
+          - make
+          - binutils
+          - zlib
+          - openssl
+          - readline
+          - ncurses
+          - zlib-devel
+          - openssl-devel
+          - readline-devel
+          - ncurses-devel
+          - psmisc
+          - libselinux-python
+    - name: Download and Unarchive SoftEther server
+      unarchive:
+        src: https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/releases/download/v4.30-9696-beta/softether-vpnserver-v4.30-9696-beta-2019.07.08-linux-x64-64bit.tar.gz
+        remote_src: yes
+        dest: /opt
+        mode: go-rwx
+    - name: Run make on SoftEther server directory
+      shell: yes 1 | make
+      args:
+        chdir: /opt/vpnserver
+    - name: Copy systemd service file
+      copy:
+        src: ./vpnserver.service
+        dest: /usr/lib/systemd/system/vpnserver.service
+    - name: Reload systemd configs
+      systemd:
+        daemon_reload: yes
+    - name: enable service vpnserver and ensure it is not masked
+      systemd:
+        name: vpnserver
+        state: restarted
+        enabled: yes
